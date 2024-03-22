@@ -1,0 +1,23 @@
+<!-- login.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+</head>
+<body>
+    <h2>Iniciar Sesión</h2>
+    {% if error %}
+        <p style="color: red;">Correo electrónico o contraseña incorrectos. Por favor, inténtalo de nuevo.</p>
+    {% endif %}
+    <form action="/" method="POST">
+        <label for="correo">Correo electrónico:</label><br>
+        <input type="email" id="correo" name="correo" required><br>
+        <label for="contrasena">Contraseña:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <input type="submit" value="Iniciar sesión">
+    </form>
+</body>
+</html>

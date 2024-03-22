@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto</title>
+</head>
+<body>
+    <form action="/editar" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="idProducto" value="{{ producto['_id'] }}">
+        <div>
+            <label for="codigo">Código:</label>
+            <input type="number" name="codigo" id="codigo" value="{{ producto['codigo'] }}" required>
+        </div>
+        <div>
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" id="nombre" value="{{ producto['nombre'] }}" required>
+        </div>
+        <div>
+            <label for="precio">Precio:</label>
+            <input type="number" name="precio" id="precio" value="{{ producto['precio'] }}" required>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                <label class="fw-bold" for="categorias">Categoria:</label>
+                <select name="categorias" id="categorias" class="formSelect" required>
+                    {% for c in categorias %}
+                        <option value="{{c['_id']}}" {% if c['_id'] == producto['categorias'] %}selected{% endif %}>{{c['nombre']}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div>
+            <label for="fileFoto">Imagen:</label>
+            <input type="file" name="fileFoto" id="fileFoto" accept="image/*">
+        </div>
+        <button type="submit">Actualizar Producto</button>
+    </form>
+</body>
+</html>
