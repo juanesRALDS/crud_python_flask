@@ -8,7 +8,20 @@ from io import BytesIO
 import base64
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 from app import app, productos, categorias, usuarios 
+from bson.objectid import ObjectId
 
+
+
+@app.route('/eliminarProducto/<producto_id>', methods=['POST'])
+def eliminarProducto(producto_id):
+    try:
+        resultado = productos.delete_one({'_id': ObjectId(producto_id)})
+        if resultado.deleted_count == 1:
+            return jsonify({"mensaje": "Producto eliminado correctamente"}), 200
+        else:
+            return jsonify({"mensaje": "No se pudo eliminar el producto"}), 400
+    except Exception as e:
+        return jsonify({"mensaje": str(e)}), 500
 
 @app.route("/listaProductos", methods=['GET', 'POST'])
 def listaProductos():
@@ -42,26 +55,73 @@ def agregarProducto():
         nombre = request.form['nombre']
         precio = int(request.form['precio'])
         idCategoria = ObjectId(request.form['cdCategoria'])
-        foto = request.files['fileFoto'] 
+        foto = request.files['fileFoto']
+        
+        if foto and allowed_file(foto.filename): # Asegúrate de tener una función allowed_file que verifique el tipo de archivo
+            producto = {
+                'codigo': codigo,
+                'nombre': nombre,
+                'precio': precio,
+                'categoria': idCategoria
+            }
+            resultado = productos.insert_one(producto)
+            if (resultado.acknowledged):
+                idProducto = resultado.inserted_id
+                nombreFotos = f'{idProducto}.jpg'
+                foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombreFotos))
+                mensaje = 'Producto Agregado Correctamente'
+                estado = True
+            else:
+                mensaje = 'Problema Al Agregar El Producto'
+        else:
+            mensaje = 'Archivo no subido o tipo de archivo no permitido'
+    except pymongo.errors.PyMongoError as error:  
+        mensaje = str(error)
+        flash((mensaje, estado))
+    return redirect(url_for('listaProductos'))
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/editarProducto/<producto_id>', methods=['GET', 'POST'])
+def editarProducto(producto_id):
+    if request.method == 'POST':
+        # Procesar la actualización del producto
+        codigo = int(request.form['codigo'])
+        nombre = request.form['nombre']
+        precio = int(request.form['precio'])
+        idCategoria = ObjectId(request.form['categorias'])
+        foto = request.files['fileFoto']
+        
         producto = {
             'codigo': codigo,
             'nombre': nombre,
             'precio': precio,
-            'categoria': idCategoria
+            'categorias': idCategoria
         }
-        resultado = productos.insert_one(producto)
-        if (resultado.acknowledged):
-            idProducto = resultado.inserted_id
-            nombreFotos = f'{idProducto}.jpg'
-            foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombreFotos))
-            mensaje = 'Producto Agregado Correctamente'
-            estado = True
+        
+        resultado = productos.update_one({'_id': ObjectId(producto_id)}, {"$set": producto})
+        if resultado.acknowledged:
+            if foto and allowed_file(foto.filename):
+                nombreFoto = f"{producto_id}.jpg"
+                foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombreFoto))
+            flash('Producto actualizado correctamente.')
+            return redirect(url_for('listaProductos'))
         else:
-            mensaje = 'Problema Al Agregar El Producto'
-    except pymongo.errors.PyMongoError as error:  
-        mensaje = str(error)
-        flash((mensaje, estado))  # Usar flash para pasar el mensaje y el estado a la página siguiente
-    return redirect(url_for('listaProductos'))
+            flash('No se pudo actualizar el producto.')
+            return redirect(url_for('editarProducto', producto_id=producto_id))
+    else:
+        # Mostrar el formulario de edición
+        producto = productos.find_one({'_id': ObjectId(producto_id)})
+        categorias_from_db = categorias.find()
+        return render_template('formEditar.html', producto=producto, categorias=categorias_from_db)
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 
 
 
@@ -126,7 +186,7 @@ def consultarPorCodigo(codigo):
     listaCategorias = categorias.find()
     return render_template("formEditar.html", producto=producto, categorias=listaCategorias)
 """
-
+"""
 @app.route("/editar", methods=["POST"])
 def editar():
     estado=False
@@ -161,4 +221,5 @@ def editar():
         mensaje=error
     return render_template("form.html", producto=producto, categorias=listaCategorias, estado=estado, mensaje=mensaje) 
 
+"""
 

@@ -26,13 +26,15 @@
                         <td>{{ p['codigo'] }}</td>
                         <td>{{ p['nombre'] }}</td>
                         <td>{{ p['precio'] }}</td>
-                        <td>{{ p['categorias'] }}</td>
+                        <td>{{ p['categoria'] }}</td>
                         <td>
                             <img src="../static/img/{{ p['_id'] }}.jpg" alt="" width="50px">
                         </td>
                         <td>
-                            <i class="fa fa-edit text-warning" title="editar"></i>
-                            <i class="fa fa-trash text-danger" title="delete"></i>
+                            <a href="{{ url_for('editarProducto', producto_id=p['_id']) }}" class="btn btn-warning">Editar</a>
+                            <form action="{{ url_for('eliminarProducto', producto_id=p['_id']) }}" method="post">
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
