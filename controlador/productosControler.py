@@ -11,6 +11,18 @@ from app import app, productos, categorias, usuarios
 from bson.objectid import ObjectId
 
 
+@app.route('/buscarProductoPorCodigo/<codigo>', methods=['GET'])
+def buscarProductoPorCodigo(codigo):
+    try:
+        producto = productos.find_one({'codigo': int(codigo)})
+        if producto:
+            # Renderizar una plantilla específica para el producto encontrado
+            return render_template('producto_detalle.html', producto=producto)
+        else:
+            return jsonify({"mensaje": "Producto no encontrado"}), 404
+    except Exception as e:
+        return jsonify({"mensaje": str(e)}), 500
+
 
 @app.route('/eliminarProducto/<producto_id>', methods=['POST'])
 def eliminarProducto(producto_id):
@@ -23,13 +35,16 @@ def eliminarProducto(producto_id):
     except Exception as e:
         return jsonify({"mensaje": str(e)}), 500
 
-@app.route("/listaProductos", methods=['GET', 'POST'])
+@app.route("/listaProductos", methods=['GET'])
 def listaProductos():
-    
+    codigo = request.args.get('codigo')
+    if codigo:
+        # Redirigir al usuario a la búsqueda por código
+        return redirect(url_for('buscarProductoPorCodigo', codigo=codigo))
+    else:
+        # Mostrar todos los productos
         listaProductos = productos.find()
         listaCategorias = categorias.find()
-        print( listaProductos) # Imprime para depuración
-        print( listaCategorias) # Imprime para depuración
         listaP = []
         for p in listaProductos:
             categoria = categorias.find_one({'_id': p.get('categorias', None)})
@@ -38,7 +53,7 @@ def listaProductos():
             else:
                 p['categoria'] = "Sin categoría"
             listaP.append(p)
-        return render_template("listaProductos.html", productos=listaP, listaCategorias=listaCategorias) # Redirigir al formulario de inicio de sesión si el usuario no está autenticado
+        return render_template("listaProductos.html", productos=listaP, listaCategorias=listaCategorias)
 
 
 @app.route('/vistaAgregarProducto', methods=['GET'])
@@ -137,7 +152,7 @@ def allowed_file(filename):
         print(error)
         return False """
 
-
+"""
 @app.route('/agregarProductoJson', methods=['POST'])
 def agregarProductoJson():
     estado = False
@@ -168,7 +183,7 @@ def agregarProductoJson():
         mensaje = str(error)
     retorno = {"estado": estado, "mensaje": mensaje}
     return jsonify(retorno)
-
+"""
 
 """ @app.route("/consultar/<codigo>", methods=["GET"])
 def consultarPorCodigo(codigo):

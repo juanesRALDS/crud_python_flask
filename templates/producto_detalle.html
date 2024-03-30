@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- producto_detalle.html -->
+{% extends 'index.html' %}
+
+{% block encabezado %}
+    {% include 'encabezado.html' %}
+{% endblock %}
+
+{% block contenido %}
+    <div>
+        <h2>{{ producto.nombre }}</h2>
+        <p>Código: {{ producto.codigo }}</p>
+        <p>Precio: {{ producto.precio }}</p>
+        <p>Categoría: {{ producto.categoria }}</p>
+        <img src="../static/img/{{ producto._id }}.jpg" alt="{{ producto.nombre }}" width="100px">
+    </div>
+{% endblock %}
+
+{% block piePagina %}
+    {% include 'piePagina.html' %}
+{% endblock %}
+
+    
+</body>
+</html>
