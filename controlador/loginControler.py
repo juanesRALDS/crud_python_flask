@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from app import app, usuarios  # Importa la colección de usuarios desde tu app
+from app import app, usuarios 
 import yagmail
 import threading
 import pymongo
