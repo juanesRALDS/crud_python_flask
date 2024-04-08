@@ -1,3 +1,5 @@
+#por favor descargar esta version de flask: Flask==2.2.5, fue la que me funciono en este proyecto para la libreria de mongoEngine
+
 from mongoengine import Document, ReferenceField, StringField, IntField, EmailField
 from bson import ObjectId
 
