@@ -66,8 +66,12 @@ def listaProductos():
 
 @app.route('/vistaAgregarProducto', methods=['GET'])
 def AgregarProducto():
-    categorias_from_db = categorias.find()
-    return render_template('Form.html', categorias=categorias_from_db)
+    if 'usuario' in session:
+        categorias_from_db = categorias.find()
+        return render_template('Form.html', categorias=categorias_from_db)
+    else:
+        mensaje='debe iniciar credenciales'
+        return render_template("login.html", mensaje=mensaje)
 
 @app.route('/agregarProducto', methods=['POST'])
 def agregarProducto():
