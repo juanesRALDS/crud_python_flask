@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
+    <script src="http://www.google.com/recaptcha/api.js"></script>
 </head>
 <body>
     <h2>Iniciar Sesión</h2>
@@ -15,9 +16,11 @@
     <form action="/" method="POST">
         <label for="correo">Correo electrónico:</label><br>
         <input type="email" id="correo" name="correo" required><br>
-        <label for="contrasena">Contraseña:</label><br>
+        <label for="password">Contraseña:</label><br>
         <input type="password" id="password" name="password" required><br><br>
         <input type="submit" value="Iniciar sesión">
+        <div class="g-recaptcha" data-sitekey="6LeKF7cpAAAAAFlok1IoWJ-e34jt6NowAnpj3t4R"></div>
     </form>
+
 </body>
 </html>

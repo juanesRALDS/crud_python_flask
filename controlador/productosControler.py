@@ -15,11 +15,16 @@ from bson.objectid import ObjectId
 def buscarProductoPorCodigo(codigo):
     try:
         producto = productos.find_one({'codigo': int(codigo)})
-        if producto:
-            # Renderizar una plantilla específica para el producto encontrado
-            return render_template('producto_detalle.html', producto=producto)
+        
+        if 'usuario' in session:
+            if producto:
+                # Renderizar una plantilla específica para el producto encontrado
+                return render_template('producto_detalle.html', producto=producto)
+            else:
+                return jsonify({"mensaje": "Producto no encontrado"}), 404
         else:
-            return jsonify({"mensaje": "Producto no encontrado"}), 404
+            mensaje='debe iniciar credenciales'
+            return render_template("login.html", mensaje=mensaje)
     except Exception as e:
         return jsonify({"mensaje": str(e)}), 500
 
@@ -38,23 +43,26 @@ def eliminarProducto(producto_id):
 @app.route("/listaProductos", methods=['GET'])
 def listaProductos():
     codigo = request.args.get('codigo')
-    if codigo:
-        # Redirigir al usuario a la búsqueda por código
-        return redirect(url_for('buscarProductoPorCodigo', codigo=codigo))
+    if 'usuario' in session:
+        if codigo:
+            # Redirigir al usuario a la búsqueda por código
+            return redirect(url_for('buscarProductoPorCodigo', codigo=codigo))
+        else:
+            # Mostrar todos los productos
+            listaProductos = productos.find()
+            listaCategorias = categorias.find()
+            listaP = []
+            for p in listaProductos:
+                categoria = categorias.find_one({'_id': p.get('categorias', None)})
+                if categoria:
+                    p['categoria'] = categoria['nombre']
+                else:
+                    p['categoria'] = "Sin categoría"
+                listaP.append(p)
+            return render_template("listaProductos.html", productos=listaP, listaCategorias=listaCategorias)
     else:
-        # Mostrar todos los productos
-        listaProductos = productos.find()
-        listaCategorias = categorias.find()
-        listaP = []
-        for p in listaProductos:
-            categoria = categorias.find_one({'_id': p.get('categorias', None)})
-            if categoria:
-                p['categoria'] = categoria['nombre']
-            else:
-                p['categoria'] = "Sin categoría"
-            listaP.append(p)
-        return render_template("listaProductos.html", productos=listaP, listaCategorias=listaCategorias)
-
+        mensaje="debe iniciar con credenciales"
+        return render_template("login.html", mensaje=mensaje)
 
 @app.route('/vistaAgregarProducto', methods=['GET'])
 def AgregarProducto():

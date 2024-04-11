@@ -26,7 +26,7 @@ class Producto(Document):
     meta = {'collection': 'PRODUCTOS'}  # Especificar el nombre de la colección que va usar, (quitar para que genere una  nueva coleccion a apartir  de la  clase)
 
 # Ahora, cuando crees y guardes un documento de la clase Categoria, se insertará en la colección "CATEGORIAS",  remplaza los datos para añadir nuevas colecciones
-#categoria = Categoria(nombre="ropa")
+#categoria = Categoria(nombre="nuevaCategoria")
 #categoria.save()
 
 #remplaza los datos para insetar nuevos documentos  
